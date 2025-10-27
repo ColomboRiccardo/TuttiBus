@@ -1,98 +1,207 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import {Text, View, StyleSheet, TextInput, Pressable, Modal, FlatList} from "react-native";
+import {Link} from "expo-router";
+import {SetStateAction, useState} from "react";
+import {Ionicons} from "@expo/vector-icons";
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+export default function Index() {
+    const [searchBus, setSearchBus] = useState("")
+    const [searchLocation, setSearchLocation] = useState("")
+    const [searchHour, setSearchHour] = useState<SetStateAction<any>>(0)
+    const [searchMinutes, setSearchMinutes] = useState<SetStateAction<any>>(0)
+    const [modalOpen, setModalOpen] = useState(false)
 
-export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+    const handleModal = () => {
+        setModalOpen(true)
+    }
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
-  );
+    return (
+        <View
+            style={styles.container}
+        >
+            <View style={styles.inputContainer}>
+                <TextInput style={styles.input} placeholder={"Cerca autobus..."} value={searchBus}
+                           onChangeText={setSearchBus}></TextInput>
+                <Ionicons style={styles.searchIcon} name={"search"}/>
+            </View>
+            <View style={styles.inputContainer}>
+                <Text style={styles.label}>Da dove vuoi partire?</Text>
+                <TextInput style={styles.input} placeholder={"Inserisci la tua posizione di partenza"}
+                           value={searchLocation}
+                           onChangeText={setSearchLocation}></TextInput>
+                <Ionicons style={styles.locationIcon} name={"location"}/>
+            </View>
+            <View style={styles.timeSelectSection}>
+                <Text>Quando vuoi partire?</Text>
+                <View style={styles.timeSelectContainer}>
+                    <TextInput style={styles.timeSelectInput} onChangeText={setSearchHour}
+                               value={searchHour}></TextInput>
+                    <Text style={{fontSize: 50, fontWeight: "bold"}}>:</Text>
+                    <TextInput style={styles.timeSelectInput} onChangeText={setSearchMinutes}
+                               value={searchMinutes}></TextInput>
+                </View>
+                <View style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    marginTop: 16,
+                    alignItems: "center"
+                }}>
+                    <Ionicons name="time" size={24}></Ionicons>
+                    <View style={{flexDirection: "row", gap: 16}}>
+                        <Pressable style={styles.formButton}>
+                            <Text>Ok</Text>
+                        </Pressable>
+                        <Pressable style={styles.formButton}>
+                            <Text>Cancel</Text>
+                        </Pressable>
+                    </View>
+                </View>
+            </View>
+            <View style={styles.resultContainer}>
+                <Text style={{alignSelf: "flex-start", marginBottom: 4}}>Ecco i risultati che abbiamo trovato:</Text>
+                <Pressable style={styles.resultItem} onPress={handleModal}>
+                    <View>
+                        <Text style={{fontSize: 16, fontWeight: "medium"}}>Piazza Eroi Sanremesi - 20.00</Text>
+                        <Text style={{fontWeight: "ultralight", fontSize: 12, marginTop: 2}}>Bordighera - Arma di
+                            Taggia</Text>
+                        {modalOpen && <BusModal setModalOpen={setModalOpen}/>}
+                    </View>
+                    <Ionicons name="arrow-forward" size={20}/>
+                </Pressable>
+                <Pressable style={styles.resultItem}>
+                    <View>
+                        <Text style={{fontSize: 16, fontWeight: "medium"}}>Piazza Eroi Sanremesi - 20.00</Text>
+                        <Text style={{fontWeight: "ultralight", fontSize: 12, marginTop: 2}}>Bordighera - Arma di
+                            Taggia</Text>
+                    </View>
+                    <Ionicons name="arrow-forward" size={20}/>
+                </Pressable>
+                <Pressable style={styles.resultItem}>
+                    <View>
+                        <Text style={{fontSize: 16, fontWeight: "medium"}}>Piazza Eroi Sanremesi - 20.00</Text>
+                        <Text style={{fontWeight: "ultralight", fontSize: 12, marginTop: 2}}>Bordighera - Arma di
+                            Taggia</Text>
+                    </View>
+                    <Ionicons name="arrow-forward" size={20}/>
+                </Pressable>
+            </View>
+        </View>
+    );
+}
+
+const BusModal = ({setModalOpen}: { setModalOpen: (value: SetStateAction<boolean>) => void }) => {
+    return (
+        <Modal>
+            <View style={{width: "100%", padding: 16}}>
+                <View style={{flexDirection: "row", alignItems: "center"}}>
+                    <Pressable onPress={e => setModalOpen(false)}>
+                        <Ionicons name="arrow-back" size={24}/>
+                    </Pressable>
+                    <Text style={{marginLeft: 12, fontSize: 20}}>Modal</Text>
+                </View>
+                <View style={{marginTop: 24}}>
+                    <Text style={{fontSize: 24, fontWeight: "medium"}}>Piazza Eroi Sanremesi - 20.00</Text>
+                    <Text style={{fontWeight: "ultralight", fontSize: 16, marginTop: 2}}>Bordighera - Arma di
+                        Taggia</Text>
+                </View>
+                <View style={{width: "100%", marginTop: 16, height: 300, backgroundColor: "grey"}}></View>
+                <View>
+                    <Text style={{marginTop: 16, marginBottom: 8, fontSize:18}}>Fermate:</Text>
+                    <FlatList data={[
+                        {key: "Bordighera"},
+                        {key: "Ospedaletti"},
+                        {key: "Sanremo"},
+                        {key: "Imperia"},
+                    ]}
+                              renderItem={({item}) =>
+                                  <View style={styles.resultItem}>
+                                      <Text style={{}}>{item.key}</Text>
+                                      <Text>20.00</Text>
+                                  </View>
+                              }/>
+                </View>
+            </View>
+        </Modal>
+    )
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
+    container: {
+        flex: 1,
+        backgroundColor: "#252292e",
+        alignItems: "center",
+        padding: 12,
+        gap: 12
+    },
+    text: {
+        color: "#000"
+    },
+    button: {
+        color: "#000"
+    },
+    input: {
+        width: "100%",
+        height: 40,
+        borderColor: "#000",
+        borderWidth: 1,
+        padding: 8
+    },
+    inputContainer: {
+        width: "100%",
+        marginBottom: 10,
+        marginTop: 10
+    },
+    searchIcon: {
+        position: "absolute",
+        right: 12,
+        top: "50%",
+        transform: [{translateY: "-50%"}]
+    },
+    locationIcon: {
+        position: "absolute",
+        right: 12,
+        top: "50%",
+    },
+    label: {
+        color: "#000",
+        marginBottom: 0
+    },
+    timeSelectSection: {
+        width: "100%",
+        backgroundColor: "lightgrey",
+        padding: 12
+    },
+    timeSelectContainer: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        width: "80%",
+        alignSelf: "center",
+        marginTop: 12
+    },
+    timeSelectInput: {
+        fontSize: 50,
+        width: "45%",
+        backgroundColor: "white",
+        textAlign: "center",
+        padding: 4
+    },
+    formButton: {
+        fontSize: 24,
+        padding: 8,
+        backgroundColor: "white"
+    },
+    resultContainer: {
+        alignItems: "center",
+        width: "100%"
+    },
+    resultItem: {
+        width: "100%",
+        backgroundColor: "white",
+        padding: 12,
+        borderColor: "grey",
+        borderWidth: 1,
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center"
+    }
 });
