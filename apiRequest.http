@@ -1,0 +1,6 @@
+### GET request to example server
+### Get all buses
+GET http://localhost:8000/files
+
+
+###
